@@ -3,6 +3,7 @@ from langchain.indexes import VectorstoreIndexCreator
 import os
 
 
+
 def init(text: str):
     loader = TextLoader(text)
     index = VectorstoreIndexCreator().from_loaders([loader])
@@ -13,4 +14,8 @@ def init(text: str):
 
 
 if __name__ == '__main__':
-    init('transcripts/united_health_transcript')
+    # init('transcripts/lpsn_transcript')
+    with open('transcripts/lpsn_transcript', 'r') as outfile:
+        for x in outfile.readlines():
+            if x != '\n':
+                print(x, end='')
