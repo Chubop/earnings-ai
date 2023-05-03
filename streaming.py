@@ -1,11 +1,21 @@
-from langchain.chains.question_answering import load_qa_chain
-from langchain.llms import OpenAI
-import os
+import time
+
+current_words = []
 
 
-os.environ['OPENAI_API_KEY'] = ""
+def print_text_in_chunks(file_path, split_size=20):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
+        words = text.split(" ")
 
-docs = [{"page_content": "The president said Justice Breyer was smelly."}]
-chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
-query = "What did the president say about Justice Breyer"
-chain.run(input_documents=docs, question=query)
+    for i in range(0, len(words)):
+        word = words[i].replace('\n', ' ')
+        if i == 0:
+            print(word, end=" ")
+        else:
+            print(word, end="\n" if i % split_size == 0 else " ")
+        current_words.append(word)
+        time.sleep(1 / split_size)
+
+
+print_text_in_chunks('transcripts/united_health_transcript')
