@@ -5,12 +5,14 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.callbacks import get_openai_callback
 
 
-def get_vector_store(documents, embedding):
+def get_vector_store(documents, embedding, from_existing_index = True):
     pinecone.init(
         api_key=os.environ['PINECONE_API_KEY'],
         environment="us-west1-gcp-free"
     )
     index_name = "earnings-ai"
+    if from_existing_index:
+        return Pinecone.from_existing_index(embedding=embedding, index_name=index_name)
     return Pinecone.from_documents(documents=documents, embedding=embedding, index_name=index_name)
 
 
@@ -51,6 +53,8 @@ class Index:
 
 if __name__ == '__main__':
 
-    pinecone.init(os.environ['PINECONE_API_KEY'])
+    pinecone.init(api_key=os.environ['PINECONE_API_KEY'])
+    pinecone.delete_index("example-index")
+
     index = pinecone.Index('earnings-ai')
     delete_response = index.delete(delete_all=True, namespace='earnings-ai')
