@@ -18,4 +18,4 @@ def print_text_in_chunks(file_path, split_size=20):
         time.sleep(1 / split_size)
 
 
-print_text_in_chunks('transcripts/united_health_transcript')
+print_text_in_chunks('transcripts/united_health_transcript.txt')

@@ -16,13 +16,13 @@ and to answer questions regarding them. Construct your answers in the tone of a 
 Answer the question based on the context below. If the question cannot be answered using the information
 provided, respond with "I don't know."
 
-Context: 
+Context: {context}
 
 Question: {query}
 Answer: """
 
 prompt_template = PromptTemplate(
-    input_variables=["query"],
+    input_variables=["query", "context"],
     template=template
 )
 
@@ -40,7 +40,7 @@ def get_vector_store(documents, embedding, from_existing_index=True):
 
 class Index:
 
-    def __init__(self, documents, embedding, chat_history = [], model_name: str = "text-davinci-003", namespace: str = "earnings-ai"):
+    def __init__(self, documents, embedding, chat_history = [], model_name: str = "gpt-3.5-turbo", namespace: str = "earnings-ai"):
         def get_chat_history(inputs) -> str:
             res = []
             for ai, human in inputs:
@@ -50,7 +50,9 @@ class Index:
         self.index = pinecone.Index(namespace)
         self.vector_store = get_vector_store(documents=documents, embedding=embedding)
 
-        llm = OpenAI(model_name=model_name, temperature=0)
+        llm = OpenAI(
+            model_name=model_name,
+            temperature=0)
         self.chat_history = chat_history
         self.chain = load_qa_chain(
             llm=llm,
@@ -58,10 +60,12 @@ class Index:
         )
         self.memory = ConversationBufferMemory(
             memory_key="chat_history",
-            return_messages=True
+            return_messages=True,
+            output_key="answer"
         )
         self.qa = ConversationalRetrievalChain.from_llm(
             llm=llm,
+            # qa_prompt=prompt_template,
             retriever=self.vector_store.as_retriever(),
             memory=self.memory,
             get_chat_history=get_chat_history
